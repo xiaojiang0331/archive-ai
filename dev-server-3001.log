@@ -1,0 +1,4 @@
+
+> archive-ai@0.1.0 dev:local
+> next dev -H 127.0.0.1 -p 3001
+
