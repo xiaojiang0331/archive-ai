@@ -1,0 +1,127 @@
+{
+  "scenarioId": "demo-harbour-catering-july-2026",
+  "status": "simulation-only",
+  "disclaimer": "All identities and amounts are fictional. This scenario illustrates data flow and review controls, not tax, payroll, accounting or legal advice.",
+  "client": {
+    "displayName": "Harbour Catering Demo Pty Ltd",
+    "entityType": "fictional proprietary company",
+    "period": "2026-07",
+    "accountingBasis": "illustrative only; confirm in production",
+    "authorisedRoles": ["bookkeeper-preparer", "accountant-reviewer", "client-approver"]
+  },
+  "inputDocuments": [
+    {
+      "id": "doc-sales-001",
+      "type": "invoice",
+      "direction": "sales",
+      "date": "2026-07-05",
+      "counterparty": "Demo Event Co",
+      "reference": "HC-1001",
+      "grossAmount": 1100,
+      "taxFields": {"netAmount": 1000, "taxAmount": 100, "treatment": "illustrative taxable-sale assumption"},
+      "expectedTask": "accounts-receivable-processing"
+    },
+    {
+      "id": "doc-sales-002",
+      "type": "invoice",
+      "direction": "sales",
+      "date": "2026-07-14",
+      "counterparty": "Fictional Office Group",
+      "reference": "HC-1002",
+      "grossAmount": 660,
+      "taxFields": {"netAmount": 600, "taxAmount": 60, "treatment": "illustrative taxable-sale assumption"},
+      "expectedTask": "accounts-receivable-processing"
+    },
+    {
+      "id": "doc-purchase-001",
+      "type": "supplier-invoice",
+      "direction": "purchase",
+      "date": "2026-07-08",
+      "counterparty": "Demo Produce Supply",
+      "reference": "DPS-778",
+      "grossAmount": 550,
+      "taxFields": {"netAmount": 500, "taxAmount": 50, "treatment": "illustrative creditable-purchase assumption"},
+      "expectedTask": "accounts-payable-processing"
+    },
+    {
+      "id": "doc-purchase-002",
+      "type": "receipt",
+      "direction": "purchase",
+      "date": "2026-07-21",
+      "counterparty": "Demo Kitchen Equipment",
+      "reference": "DK-0021",
+      "grossAmount": 330,
+      "taxFields": {"netAmount": 300, "taxAmount": 30, "treatment": "illustrative creditable-purchase assumption"},
+      "expectedTask": "accounts-payable-processing"
+    },
+    {
+      "id": "doc-purchase-003",
+      "type": "receipt",
+      "direction": "purchase",
+      "date": "2026-07-27",
+      "counterparty": "Unclear Hospitality Expense",
+      "reference": "UHE-27",
+      "grossAmount": 220,
+      "taxFields": {"netAmount": 200, "taxAmount": 20, "treatment": "unknown; must be reviewed"},
+      "expectedTask": "document-intake-classification",
+      "expectedException": "uncertain business purpose and tax treatment"
+    }
+  ],
+  "mockPayrollInput": {
+    "employeeCount": 1,
+    "grossEarnings": 3000,
+    "paygWithholding": 600,
+    "approvedDeductions": 0,
+    "superTreatment": "not calculated in this scenario; use current approved payroll configuration in production",
+    "expectedTask": "payroll-workpaper"
+  },
+  "mockBankReconciliationInput": {
+    "statementClosingBalance": 18270,
+    "ledgerClosingBalanceBeforeReconcilingItems": 17920,
+    "unpresentedOrTimingItems": 350,
+    "expectedTask": "bank-card-reconciliation"
+  },
+  "expectedOutputs": {
+    "accountsReceivable": {
+      "invoiceGrossTotal": 1760,
+      "receiptsApplied": 1100,
+      "expectedOutstanding": 660,
+      "formula": "invoice gross total - receipts applied"
+    },
+    "accountsPayable": {
+      "reviewedPurchaseGrossTotal": 880,
+      "unknownTreatmentAmount": 220,
+      "formula": "reviewed supplier bills - applied payments; unknown document remains in exception queue"
+    },
+    "bankReconciliation": {
+      "adjustedLedgerBalance": 18270,
+      "expectedUnexplainedDifference": 0,
+      "formula": "statement closing balance - (ledger balance + valid timing items)"
+    },
+    "payroll": {
+      "expectedNetPay": 2400,
+      "formula": "gross earnings - PAYG withholding - approved deductions",
+      "requiredReview": "confirm employee terms, payroll configuration and payment authority"
+    },
+    "draftGstWorkpaper": {
+      "gstOnIllustrativeSales": 160,
+      "creditsOnReviewedIllustrativePurchases": 80,
+      "provisionalDifference": 80,
+      "excludedAmount": 20,
+      "formula": "GST on illustrative sales - credits on reviewed illustrative purchases; exclude uncertain receipt until reviewer decides",
+      "requiredReview": "confirm basis, supply classification, eligibility, adjustments and final BAS mapping"
+    },
+    "reviewQueue": [
+      "doc-purchase-003: uncertain business purpose/tax treatment",
+      "payroll: payment release and current payroll settings",
+      "BAS: authorised review/lodgment only"
+    ]
+  },
+  "acceptanceChecksForArchiveAi": [
+    "each document is linked to a user/client owner and immutable original",
+    "AI may propose document type and coding but must show confidence and reason",
+    "uncertain receipt appears in a review queue instead of final BAS totals",
+    "every formula records its inputs and a reviewer state",
+    "no simulated result is labelled lodged, paid, approved or legally final"
+  ]
+}

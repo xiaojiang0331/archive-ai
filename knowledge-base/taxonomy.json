@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "jurisdiction": "AU",
+  "roles": [
+    "client",
+    "bookkeeper",
+    "bas_agent",
+    "tax_agent",
+    "financial_accountant",
+    "registered_company_auditor",
+    "practice_manager",
+    "reviewer"
+  ],
+  "workflows": [
+    "client_onboarding_and_authority",
+    "document_intake_and_classification",
+    "bookkeeping_and_reconciliation",
+    "bas_and_gst",
+    "payroll_payg_and_super",
+    "income_tax_compliance",
+    "financial_statement_preparation",
+    "asic_company_secretarial",
+    "audit_review_and_assurance",
+    "management_reporting_and_advisory",
+    "quality_management_and_supervision",
+    "privacy_security_and_retention",
+    "aml_ctf_risk_management"
+  ],
+  "documentTypes": [
+    "invoice",
+    "receipt",
+    "credit_note",
+    "bank_statement",
+    "credit_card_statement",
+    "payroll_register",
+    "payslip",
+    "super_contribution_report",
+    "activity_statement",
+    "bas_workpaper",
+    "tax_return",
+    "notice_of_assessment",
+    "financial_statements",
+    "general_ledger",
+    "trial_balance",
+    "journal_workpaper",
+    "asic_annual_statement",
+    "engagement_letter",
+    "identity_evidence",
+    "audit_workpaper",
+    "other"
+  ],
+  "riskLevels": {
+    "low": "Administrative classification or retrieval with no external submission.",
+    "medium": "Draft calculation, checklist, or client communication requiring practitioner review.",
+    "high": "Tax position, lodgment, identity decision, audit conclusion, legal applicability, or movement of money."
+  },
+  "mandatoryHumanGates": [
+    "client_identity_and_authority_acceptance",
+    "tax_or_bas_lodgment",
+    "amendment_or_correction_lodgment",
+    "financial_statement_approval",
+    "audit_or_assurance_conclusion",
+    "aml_ctf_risk_or_reporting_decision",
+    "release_of_personal_information",
+    "payment_or_bank_detail_change",
+    "destructive_record_deletion"
+  ]
+}

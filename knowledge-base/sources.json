@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "checkedAt": "2026-07-17",
+  "jurisdiction": "Australia",
+  "sources": [
+    {
+      "id": "ato-business-overview",
+      "authority": "Australian Taxation Office",
+      "authorityLevel": "regulator",
+      "title": "Businesses and organisations",
+      "url": "https://www.ato.gov.au/businesses-and-organisations/",
+      "topics": ["business-registration", "gst", "tax", "payroll", "super", "record-keeping"],
+      "reviewCadenceDays": 90,
+      "notes": "Primary navigation source for Australian business tax and super obligations."
+    },
+    {
+      "id": "ato-bas",
+      "authority": "Australian Taxation Office",
+      "authorityLevel": "regulator",
+      "title": "Business activity statements (BAS)",
+      "url": "https://www.ato.gov.au/businesses-and-organisations/preparing-lodging-and-paying/business-activity-statements-bas",
+      "topics": ["bas", "gst", "payg-withholding", "payg-instalments", "lodgment"],
+      "reviewCadenceDays": 30,
+      "notes": "Canonical starting point for BAS preparation, lodgment, payment, and corrections."
+    },
+    {
+      "id": "ato-payg-withholding",
+      "authority": "Australian Taxation Office",
+      "authorityLevel": "regulator",
+      "title": "Pay as you go (PAYG) withholding",
+      "url": "https://www.ato.gov.au/businesses-and-organisations/preparing-lodging-and-paying/business-activity-statements-bas/pay-as-you-go-payg-withholding",
+      "topics": ["payroll", "payg-withholding", "bas"],
+      "reviewCadenceDays": 60,
+      "notes": "Reporting and payment guidance for amounts withheld from workers and other payees."
+    },
+    {
+      "id": "tpb-code",
+      "authority": "Tax Practitioners Board",
+      "authorityLevel": "regulator",
+      "title": "Code of Professional Conduct",
+      "url": "https://www.tpb.gov.au/code-professional-conduct",
+      "topics": ["ethics", "competence", "confidentiality", "quality-management", "client-records", "client-communication"],
+      "reviewCadenceDays": 30,
+      "notes": "Core professional obligations for registered tax and BAS agents; high-risk source."
+    },
+    {
+      "id": "tpb-bas-registration",
+      "authority": "Tax Practitioners Board",
+      "authorityLevel": "regulator",
+      "title": "BAS agent registration",
+      "url": "https://www.tpb.gov.au/bas-agent-registration",
+      "topics": ["bas-agent", "registration", "supervision", "competence"],
+      "reviewCadenceDays": 90,
+      "notes": "Use to distinguish registered-practitioner work from general bookkeeping assistance."
+    },
+    {
+      "id": "aasb-standards",
+      "authority": "Australian Accounting Standards Board",
+      "authorityLevel": "standard-setter",
+      "title": "AASB Standards Portal",
+      "url": "https://standards.aasb.gov.au/",
+      "topics": ["financial-reporting", "accounting-standards", "sustainability-reporting"],
+      "reviewCadenceDays": 30,
+      "notes": "Canonical source for current Australian Accounting Standards and applicable reporting periods."
+    },
+    {
+      "id": "auasb-standards",
+      "authority": "Auditing and Assurance Standards Board",
+      "authorityLevel": "standard-setter",
+      "title": "AUASB Standards Portal",
+      "url": "https://standards.auasb.gov.au/",
+      "topics": ["audit", "review", "assurance", "related-services"],
+      "reviewCadenceDays": 30,
+      "notes": "Canonical source for Australian auditing, review, assurance, and related-services standards."
+    },
+    {
+      "id": "asic-annual-review",
+      "authority": "Australian Securities and Investments Commission",
+      "authorityLevel": "regulator",
+      "title": "Company annual review",
+      "url": "https://www.asic.gov.au/for-business-and-companies/companies/company-annual-review/",
+      "topics": ["asic", "company-secretarial", "annual-review", "solvency-resolution"],
+      "reviewCadenceDays": 60,
+      "notes": "Company annual statement, review fee, details check, and solvency-resolution workflow."
+    },
+    {
+      "id": "asic-small-proprietary",
+      "authority": "Australian Securities and Investments Commission",
+      "authorityLevel": "regulator",
+      "title": "Small proprietary companies",
+      "url": "https://asic.gov.au/regulatory-resources/financial-reporting-and-audit/preparers-of-financial-reports/small-proprietary-companies/",
+      "topics": ["financial-reporting", "small-proprietary-company", "audit", "lodgment"],
+      "reviewCadenceDays": 60,
+      "notes": "Use for entity-specific reporting and audit applicability; always requires human review."
+    },
+    {
+      "id": "fairwork-records-payslips",
+      "authority": "Fair Work Ombudsman",
+      "authorityLevel": "regulator",
+      "title": "Record-keeping and pay slips fact sheet",
+      "url": "https://www.fairwork.gov.au/tools-and-resources/fact-sheets/rights-and-obligations/record-keeping-pay-slips",
+      "topics": ["payroll", "employee-records", "payslips", "retention"],
+      "reviewCadenceDays": 60,
+      "notes": "Primary source for employment record and payslip requirements."
+    },
+    {
+      "id": "oaic-app-guidelines",
+      "authority": "Office of the Australian Information Commissioner",
+      "authorityLevel": "regulator",
+      "title": "Australian Privacy Principles guidelines",
+      "url": "https://www.oaic.gov.au/privacy/australian-privacy-principles/australian-privacy-principles-guidelines",
+      "topics": ["privacy", "data-security", "access", "correction", "cross-border-disclosure"],
+      "reviewCadenceDays": 60,
+      "notes": "Privacy baseline for client documents and personal information; applicability must be assessed."
+    },
+    {
+      "id": "austrac-aml-ctf-2026",
+      "authority": "AUSTRAC",
+      "authorityLevel": "regulator",
+      "title": "Update to regulator statement of expectations – May 2026",
+      "url": "https://www.austrac.gov.au/update-regulator-statement-expectations-may-2026",
+      "topics": ["aml-ctf", "client-due-diligence", "risk-management", "accounting-practices"],
+      "reviewCadenceDays": 14,
+      "notes": "Fast-changing 2026 implementation area. Do not automate conclusions without current specialist review."
+    }
+  ]
+}
