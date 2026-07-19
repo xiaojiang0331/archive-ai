@@ -1,20 +1,18 @@
 # Task Brief Template
 
-Copy this into a chat and replace the bracketed text.
-
 ```text
-[Harness: H1/H2/H3] + [Loop: L1/L2/L3/L4]
+[Harness: H1/H2/H3]
 
 Goal
-[One user outcome, not a solution.]
+[One observable user outcome.]
 
 Context
-[Where it appears in Archive AI and who uses it.]
+[Where the behavior appears and who uses it.]
 
 Acceptance criteria
-- [Observable user outcome]
-- [Data/security constraint]
-- [Required checks, e.g. lint + build]
+- AC-1: [Observable functional result.]
+- AC-2: [Data, security, or privacy boundary.]
+- AC-3: [Required automated or realistic check.]
 
 Constraints
 - Do not [out-of-scope behavior].
@@ -22,12 +20,16 @@ Constraints
 - Do not expose secrets or real client data.
 
 Authority
-- You may: [inspect/edit/test/prepare].
-- Ask me before: [migration/deploy/push/delete/send].
+- Developer may: [inspect/edit/test/prepare].
+- Human approval required before: [deploy/migrate/delete/send/pay].
 
-Deliverable
-[Code / SQL file / research draft / explanation / checklist]
+Evidence contract
+- Changed artifacts: [expected files or resources].
+- Commands: [lint/build/test or other checks].
+- Functional evidence: [browser/API/database observation].
+- Maximum review attempts: 3.
 
-Stop condition
-[When to pause and ask rather than guess.]
+Independent review
+After development, invoke $independent-acceptance-review.
+The reviewer must not edit implementation or change these criteria.
 ```
