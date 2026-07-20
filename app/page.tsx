@@ -22,10 +22,24 @@ type ArchiveRecord = {
   confidence: number;
   amount: string;
   uploadedAt: string;
+  createdAt?: string;
   filePath?: string;
   analysisStatus?: AnalysisStatus;
   summary?: string;
   extractedText?: string;
+};
+
+type MonthlyExpenseSlice = {
+  category: string;
+  amount: number;
+  percentage: number;
+  color: string;
+};
+
+type MonthlyExpenseGroup = {
+  currency: string;
+  total: number;
+  slices: MonthlyExpenseSlice[];
 };
 
 type ArchiveEditDraft = {
@@ -263,6 +277,14 @@ function localizeRuntimeMessage(message: string, language: Language) {
 
 const STORAGE_KEY = "archive-ai-records";
 const AUTH_STORAGE_KEY = "archive-ai-auth-session";
+const MONTHLY_CHART_COLORS = [
+  "#67e8f9",
+  "#a78bfa",
+  "#fbbf24",
+  "#fb7185",
+  "#34d399",
+  "#f97316",
+];
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const SUPABASE_BUCKET =
@@ -312,6 +334,89 @@ function formatFileSize(size: number) {
   return `${(size / 1024 / 1024).toFixed(1)} MB`;
 }
 
+function parseArchiveAmount(amount: string) {
+  const normalized = amount.trim().replace(/,/g, "");
+  const numberMatch = normalized.match(/-?\d+(?:\.\d+)?/);
+
+  if (!numberMatch) {
+    return null;
+  }
+
+  const value = Number(numberMatch[0]);
+
+  if (!Number.isFinite(value) || value <= 0) {
+    return null;
+  }
+
+  const currencyMatch = normalized.match(/\b(AUD|USD|NZD|CAD|GBP|EUR)\b/i);
+  const currency = currencyMatch
+    ? currencyMatch[1].toUpperCase()
+    : normalized.includes("$")
+      ? "$"
+      : normalized.includes("€")
+        ? "€"
+        : normalized.includes("£")
+          ? "£"
+          : "";
+
+  return { currency, value };
+}
+
+function isInCurrentMonth(isoDate: string | undefined, now = new Date()) {
+  if (!isoDate) {
+    return false;
+  }
+
+  const date = new Date(isoDate);
+
+  return (
+    !Number.isNaN(date.getTime()) &&
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth()
+  );
+}
+
+function getMonthlyExpenseGroups(records: ArchiveRecord[]): MonthlyExpenseGroup[] {
+  const groups = new Map<string, Map<string, number>>();
+
+  for (const record of records) {
+    if (!isInCurrentMonth(record.createdAt)) {
+      continue;
+    }
+
+    const parsedAmount = parseArchiveAmount(record.amount);
+
+    if (!parsedAmount) {
+      continue;
+    }
+
+    const category = record.category.trim() || "Uncategorized";
+    const categoryTotals = groups.get(parsedAmount.currency) ?? new Map<string, number>();
+    categoryTotals.set(category, (categoryTotals.get(category) ?? 0) + parsedAmount.value);
+    groups.set(parsedAmount.currency, categoryTotals);
+  }
+
+  return [...groups.entries()]
+    .map(([currency, categoryTotals]) => {
+      const total = [...categoryTotals.values()].reduce((sum, value) => sum + value, 0);
+      const slices = [...categoryTotals.entries()]
+        .sort(([, left], [, right]) => right - left)
+        .map(([category, amount], index) => ({
+          amount,
+          category,
+          color: MONTHLY_CHART_COLORS[index % MONTHLY_CHART_COLORS.length],
+          percentage: (amount / total) * 100,
+        }));
+
+      return { currency, slices, total };
+    })
+    .sort((left, right) => right.total - left.total);
+}
+
+function formatMoney(amount: number, currency: string) {
+  return currency ? `${currency} ${amount.toFixed(2)}` : amount.toFixed(2);
+}
+
 function analyzeFile(file: File): AnalysisResult {
   const loweredName = file.name.toLowerCase();
   const isInvoice = loweredName.includes("invoice") || loweredName.includes("bill");
@@ -348,6 +453,7 @@ function createLocalRecord(file: File, analysis: AnalysisResult): ArchiveRecord 
     category: analysis.category,
     confidence: analysis.confidence,
     amount: "$--.--",
+    createdAt: new Date().toISOString(),
     uploadedAt: "Just now",
     analysisStatus: "completed",
     summary: analysis.summary,
@@ -364,6 +470,7 @@ function mapSupabaseRow(row: SupabaseArchiveRow): ArchiveRecord {
     category: row.category,
     confidence: row.confidence,
     amount: row.amount,
+    createdAt: row.created_at,
     uploadedAt: new Date(row.created_at).toLocaleString(),
     filePath: row.file_path ?? undefined,
     analysisStatus: row.analysis_status,
@@ -720,6 +827,53 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!HAS_SUPABASE_CONFIG || !session) {
+      return;
+    }
+
+    let cancelled = false;
+    const refreshInMilliseconds = Math.max(
+      1_000,
+      (session.expires_at - Math.floor(Date.now() / 1000) - 60) * 1_000,
+    );
+
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        try {
+          const refreshedSession = await refreshAuthSession(session);
+
+          if (!refreshedSession) {
+            throw new Error("Session refresh failed");
+          }
+
+          window.localStorage.setItem(
+            AUTH_STORAGE_KEY,
+            JSON.stringify(refreshedSession),
+          );
+
+          if (!cancelled) {
+            setSession(refreshedSession);
+          }
+        } catch {
+          window.localStorage.removeItem(AUTH_STORAGE_KEY);
+
+          if (!cancelled) {
+            setSession(null);
+            setRecords([]);
+            setBackendMessage("Sign in to load your private archive records.");
+            setAuthMessage("Your session expired. Please sign in again.");
+          }
+        }
+      })();
+    }, refreshInMilliseconds);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [session]);
+
+  useEffect(() => {
     if (!authReady) {
       return;
     }
@@ -784,6 +938,18 @@ export default function Home() {
   }, [hasLoaded, records]);
 
   const latestRecord = records[0];
+  const monthlyExpenseGroups = useMemo(
+    () => getMonthlyExpenseGroups(records),
+    [records],
+  );
+  const currentMonthLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en-AU", {
+        month: "long",
+        year: "numeric",
+      }).format(new Date()),
+    [language],
+  );
   const isAuthenticated = !HAS_SUPABASE_CONFIG || Boolean(session);
   const ui = uiCopy[language];
   const faceNames = [
@@ -1478,6 +1644,53 @@ export default function Home() {
                 <span>{ui.latest}: {latestRecord?.name ?? ui.noneYet}</span>
                 <div className="flex gap-2"><button className="rounded-xl border border-indigo-300/30 px-3 py-2 transition hover:border-indigo-200 hover:bg-indigo-300/10" onClick={() => void refreshArchive()} type="button">{ui.refresh}</button>{!HAS_SUPABASE_CONFIG ? <button className="rounded-xl border border-indigo-300/30 px-3 py-2 transition hover:border-indigo-200 hover:bg-indigo-300/10" onClick={resetLocalArchive} type="button">{ui.reset}</button> : null}</div>
               </div>
+              <section className="mt-6 rounded-2xl border border-indigo-300/25 bg-slate-950/60 p-5" aria-label={language === "zh" ? "本月支出" : "Monthly spending"}>
+                <div className="flex flex-wrap items-end justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-indigo-100">{language === "zh" ? "本月支出" : "Monthly spending"}</p>
+                    <p className="mt-1 text-sm text-indigo-100/60">{currentMonthLabel}</p>
+                  </div>
+                  <p className="text-xs text-indigo-100/55">{language === "zh" ? "仅统计已识别的正数金额" : "Recognized positive amounts only"}</p>
+                </div>
+                {monthlyExpenseGroups.length > 0 ? (
+                  <div className="mt-5 grid gap-5 xl:grid-cols-2">
+                    {monthlyExpenseGroups.map((group) => {
+                      let offset = 0;
+                      const chartStops = group.slices.map((slice) => {
+                        const start = offset;
+                        offset += slice.percentage;
+                        return `${slice.color} ${start}% ${offset}%`;
+                      });
+                      const currencyLabel = group.currency || (language === "zh" ? "未标记货币" : "Unmarked currency");
+                      const chartLabel = `${language === "zh" ? "本月支出" : "Monthly spending"}: ${formatMoney(group.total, group.currency)}`;
+
+                      return (
+                        <div className="rounded-2xl border border-indigo-300/15 bg-slate-900/70 p-4" key={group.currency || "unmarked"}>
+                          <div className="flex items-baseline justify-between gap-3">
+                            <p className="text-sm font-medium text-indigo-100">{currencyLabel}</p>
+                            <p className="text-xl font-semibold text-white">{formatMoney(group.total, group.currency)}</p>
+                          </div>
+                          <div className="mt-4 grid gap-5 sm:grid-cols-[10rem_1fr] sm:items-center">
+                            <div className="relative mx-auto h-40 w-40 rounded-full" role="img" aria-label={chartLabel} style={{ background: `conic-gradient(${chartStops.join(",")})` }}>
+                              <div className="absolute inset-8 flex items-center justify-center rounded-full bg-slate-950 text-center text-xs font-semibold text-indigo-100">{language === "zh" ? "总计" : "Total"}</div>
+                            </div>
+                            <ul className="grid gap-3">
+                              {group.slices.map((slice) => (
+                                <li className="flex items-start justify-between gap-3 text-sm" key={slice.category}>
+                                  <span className="flex min-w-0 items-center gap-2 text-indigo-100/80"><span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: slice.color }} /><span className="truncate">{slice.category}</span></span>
+                                  <span className="shrink-0 text-right text-indigo-50">{formatMoney(slice.amount, group.currency)}<span className="ml-1 text-indigo-100/55">{slice.percentage.toFixed(0)}%</span></span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="mt-5 rounded-xl border border-dashed border-indigo-300/25 bg-slate-900/60 px-4 py-5 text-sm leading-6 text-indigo-100/70">{language === "zh" ? "本月还没有可计入图表的已识别金额。金额为空或无法读取的归档不会被猜测或计入。" : "No recognized spending is available for this month yet. Empty or unreadable amounts are never guessed or included."}</p>
+                )}
+              </section>
               {archiveEditMessage ? (
                 <p
                   className="mt-4 rounded-xl border border-indigo-300/25 bg-indigo-300/10 px-4 py-3 text-sm text-indigo-50"
