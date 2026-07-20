@@ -12,6 +12,7 @@
 - Supabase private archive records and per-user Storage paths with RLS isolation.
 - Image upload, preview, persistence after refresh, and editable archive analysis fields.
 - AI-generated category persistence and archive display, accepted by authenticated browser review on 2026-07-20.
+- Monthly spending dashboard with category allocation, accepted by authenticated browser review on 2026-07-20.
 - OCR → DeepSeek → Supabase archive flow, documented in `docs/acceptance/ocr-deepseek.md`.
 - Global independent acceptance reviewer with six verdicts.
 - Three-layer control architecture and project-local dependency bootstrap authority, accepted by independent review.
@@ -20,7 +21,7 @@
 
 | Feature | Status | Dependency | Next action |
 | --- | --- | --- | --- |
-| Monthly expense chart | in_progress | AI category classification and persisted amounts | Execute `docs/task-briefs/monthly-expense-chart.md`; show a private current-month total and category allocation. |
+| GitHub publication | blocked | explicit user authorization to write to `origin/main` | Push the completed local commits only after the user confirms the external publication target. |
 
 ## Queued after the active feature passes
 
@@ -38,9 +39,4 @@
 
 ## Active Task Brief
 
-**ID:** `monthly-expense-chart`
-**Goal:** show the authenticated user's current-month spending total and category allocation as a readable pie chart in the Archive workspace.
-**Brief:** `docs/task-briefs/monthly-expense-chart.md`
-**Allowed paths:** `app/page.tsx`, the active brief, and focused verification artifacts.
-**Required checks:** authenticated browser data check, `npm.cmd run lint`, `npm.cmd run build`, scoped diff, and independent acceptance review.
-**Maximum review attempts:** 3.
+No product feature is active. The next product feature after GitHub publication is **Archive search and filtering**. The active release action is blocked only on explicit confirmation to publish to the configured remote's `main` branch.
