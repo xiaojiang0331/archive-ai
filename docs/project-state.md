@@ -21,7 +21,7 @@
 
 | Feature | Status | Dependency | Next action |
 | --- | --- | --- | --- |
-| GitHub publication | blocked | explicit user authorization to write to `origin/main` | Push the completed local commits only after the user confirms the external publication target. |
+| Archive search and filtering | ready | three-layer control architecture | Create the next bounded Task Brief after the completed GitHub publication. |
 
 ## Queued after the active feature passes
 
@@ -39,4 +39,4 @@
 
 ## Active Task Brief
 
-No product feature is active. The next product feature after GitHub publication is **Archive search and filtering**. The active release action is blocked only on explicit confirmation to publish to the configured remote's `main` branch.
+No product feature is active. GitHub publication to the configured remote's `main` branch completed on 2026-07-20. The next product feature is **Archive search and filtering**.
