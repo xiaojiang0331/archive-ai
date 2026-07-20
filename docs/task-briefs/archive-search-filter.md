@@ -1,7 +1,7 @@
 # Task Brief — Archive Search and Filtering
 
-**ID:** `archive-search-filter`  
-**Harness mode:** H2 — Product Feature  
+**ID:** `archive-search-filter`
+**Harness mode:** H2 — Product Feature
 **Status:** ready for execution; no implementation has started.
 
 ## Goal

@@ -1,8 +1,8 @@
 # Task Brief — AI Category Classification and Archive Display
 
-**ID:** `ai-category-archive-display`  
-**Version:** v1  
-**Harness mode:** H2 — Product Feature  
+**ID:** `ai-category-archive-display`
+**Version:** v1
+**Harness mode:** H2 — Product Feature
 **Status:** ready for execution.
 
 ## Goal

@@ -38,9 +38,9 @@
 
 ## Active Task Brief
 
-**ID:** `ai-category-archive-display`  
-**Goal:** verify and complete AI-generated category persistence and display in the current authenticated user's archive.  
-**Brief:** `docs/task-briefs/ai-category-archive-display.md`  
-**Allowed paths:** `app/page.tsx`, `app/api/analyze/route.ts`, the active brief, and focused verification artifacts.  
-**Required checks:** authenticated browser flow, `npm.cmd run lint`, `npm.cmd run build`, scoped diff, and independent acceptance review.  
+**ID:** `ai-category-archive-display`
+**Goal:** verify and complete AI-generated category persistence and display in the current authenticated user's archive.
+**Brief:** `docs/task-briefs/ai-category-archive-display.md`
+**Allowed paths:** `app/page.tsx`, `app/api/analyze/route.ts`, the active brief, and focused verification artifacts.
+**Required checks:** authenticated browser flow, `npm.cmd run lint`, `npm.cmd run build`, scoped diff, and independent acceptance review.
 **Maximum review attempts:** 3.

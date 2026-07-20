@@ -1,7 +1,7 @@
 # Task Brief — Control Architecture Bootstrap
 
-**ID:** `control-architecture-bootstrap`  
-**Harness mode:** H2 — Product Feature  
+**ID:** `control-architecture-bootstrap`
+**Harness mode:** H2 — Product Feature
 **Status:** completed by independent review `control-architecture-bootstrap-20260719`
 
 ## Goal
