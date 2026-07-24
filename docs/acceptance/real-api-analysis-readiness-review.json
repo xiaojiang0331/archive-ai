@@ -1,0 +1,53 @@
+{
+  "review_id": "real-api-analysis-readiness-v1-20260720",
+  "verdict": "PASS",
+  "summary": "The configured server-side OCR to DeepSeek analysis path completed a real request successfully while lint, production build, and private-data safeguards passed inspection.",
+  "attempt": {
+    "current": 1,
+    "maximum": 3
+  },
+  "criteria": [
+    {
+      "id": "AC-1",
+      "status": "PASS",
+      "evidence": [
+        "The real verifier completed with accepted: true using deepseek-v4-flash.",
+        "The DeepSeek key is read only in app/api/analyze/route.ts and scripts/verify-ocr-deepseek.mjs; no NEXT_PUBLIC_ AI key was found, and .gitignore excludes .env files."
+      ]
+    },
+    {
+      "id": "AC-2",
+      "status": "PASS",
+      "evidence": [
+        "npm.cmd run verify:ocr-deepseek -- test-fixtures/australian-tax-invoice-ocr-fixture.png exited 0 with accepted: true, 300 OCR characters, and all six required analysis fields."
+      ]
+    },
+    {
+      "id": "AC-3",
+      "status": "PASS",
+      "evidence": [
+        "The route requires a bearer token, uses that token for archive reads and updates, downloads through the authenticated private Storage endpoint, and limits type and size before analysis.",
+        "supabase/schema.sql enforces authenticated user_id equality for archive read, insert, update, and delete policies and folder ownership for Storage objects."
+      ]
+    },
+    {
+      "id": "AC-4",
+      "status": "PASS",
+      "evidence": [
+        "npm.cmd run lint exited 0.",
+        "npm.cmd run build exited 0 and produced the /api/analyze dynamic route."
+      ]
+    },
+    {
+      "id": "AC-5",
+      "status": "PASS",
+      "evidence": [
+        "The feature diff is limited to Task Brief, project-state, and acceptance evidence; no login, upload, archive UI, editable-field, or monthly-dashboard implementation changed.",
+        "The production build compiled the existing application successfully."
+      ]
+    }
+  ],
+  "issues": [],
+  "required_action": "None.",
+  "human_required": false
+}

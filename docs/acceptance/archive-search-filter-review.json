@@ -1,0 +1,54 @@
+{
+  "review_id": "archive-search-filter-v1-20260720",
+  "verdict": "BLOCKED",
+  "summary": "The implementation, RLS boundary inspection, lint, and production build pass, but the required authenticated browser interaction evidence is unavailable to this reviewer.",
+  "attempt": {
+    "current": 1,
+    "maximum": 3
+  },
+  "criteria": [
+    {
+      "id": "AC-1",
+      "status": "PASS",
+      "evidence": ["app/page.tsx derives filteredArchiveRecords from file name, category, document type, amount, summary, and extracted OCR text."]
+    },
+    {
+      "id": "AC-2",
+      "status": "PASS",
+      "evidence": ["app/page.tsx combines status, category, document-type, and text predicates, and clearArchiveFilters resets all four control states."]
+    },
+    {
+      "id": "AC-3",
+      "status": "PASS",
+      "evidence": ["Filtering is applied only to the records array. fetchArchiveRows still requests the authenticated Supabase archives endpoint with the current access token; no new cross-user query path was added."]
+    },
+    {
+      "id": "AC-4",
+      "status": "PASS",
+      "evidence": ["The new controls and empty state provide Chinese and English inline labels."]
+    },
+    {
+      "id": "AC-5",
+      "status": "PASS",
+      "evidence": ["The diff is limited to the archive client UI and control documents; authentication, upload, OCR, DeepSeek route, RLS schema, and API configuration were not changed."]
+    },
+    {
+      "id": "AC-6",
+      "status": "UNVERIFIED",
+      "evidence": [
+        "npm.cmd run lint exited 0.",
+        "npm.cmd run build exited 0.",
+        "The required authenticated browser search, combined-filter, clear, and refresh observation could not be performed in the current execution environment."
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "criterion_id": "AC-6",
+      "problem": "No direct authenticated browser evidence covers search, combined filters, clear filters, refresh, and user-private results.",
+      "required_evidence": "Run the five manual authenticated checks listed in the task brief and provide the observed results or a screenshot."
+    }
+  ],
+  "required_action": "Obtain authenticated browser evidence for AC-6 before accepting this feature.",
+  "human_required": false
+}

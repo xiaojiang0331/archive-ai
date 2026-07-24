@@ -767,6 +767,11 @@ export default function Home() {
   const [archiveEditMessage, setArchiveEditMessage] = useState<string | null>(
     null,
   );
+  const [archiveSearchQuery, setArchiveSearchQuery] = useState("");
+  const [archiveStatusFilter, setArchiveStatusFilter] = useState("all");
+  const [archiveCategoryFilter, setArchiveCategoryFilter] = useState("all");
+  const [archiveDocumentTypeFilter, setArchiveDocumentTypeFilter] =
+    useState("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -942,6 +947,52 @@ export default function Home() {
     () => getMonthlyExpenseGroups(records),
     [records],
   );
+  const archiveFilterOptions = useMemo(() => {
+    const uniqueValues = (values: string[]) =>
+      [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort(
+        (left, right) => left.localeCompare(right),
+      );
+
+    return {
+      categories: uniqueValues(records.map((record) => record.category)),
+      documentTypes: uniqueValues(
+        records.map((record) => record.documentType),
+      ),
+      statuses: uniqueValues(records.map((record) => record.status)),
+    };
+  }, [records]);
+  const filteredArchiveRecords = useMemo(() => {
+    const normalizedSearch = archiveSearchQuery.trim().toLocaleLowerCase();
+
+    return records.filter((record) => {
+      const searchableText = [
+        record.name,
+        record.category,
+        record.documentType,
+        record.amount,
+        record.summary ?? "",
+        record.extractedText ?? "",
+      ]
+        .join(" ")
+        .toLocaleLowerCase();
+
+      return (
+        (archiveStatusFilter === "all" ||
+          record.status === archiveStatusFilter) &&
+        (archiveCategoryFilter === "all" ||
+          record.category === archiveCategoryFilter) &&
+        (archiveDocumentTypeFilter === "all" ||
+          record.documentType === archiveDocumentTypeFilter) &&
+        (!normalizedSearch || searchableText.includes(normalizedSearch))
+      );
+    });
+  }, [
+    archiveCategoryFilter,
+    archiveDocumentTypeFilter,
+    archiveSearchQuery,
+    archiveStatusFilter,
+    records,
+  ]);
   const currentMonthLabel = useMemo(
     () =>
       new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en-AU", {
@@ -1316,6 +1367,13 @@ export default function Home() {
     setRecords(initialRecords);
     window.localStorage.removeItem(STORAGE_KEY);
     setBackendMessage("Local fallback archive was reset.");
+  }
+
+  function clearArchiveFilters() {
+    setArchiveSearchQuery("");
+    setArchiveStatusFilter("all");
+    setArchiveCategoryFilter("all");
+    setArchiveDocumentTypeFilter("all");
   }
 
   async function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {
@@ -1699,8 +1757,81 @@ export default function Home() {
                   {archiveEditMessage}
                 </p>
               ) : null}
+              <section
+                aria-label={language === "zh" ? "归档搜索和筛选" : "Archive search and filters"}
+                className="mt-6 rounded-2xl border border-indigo-300/25 bg-slate-950/60 p-5"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-indigo-100">
+                      {language === "zh" ? "搜索和筛选" : "Search and filters"}
+                    </p>
+                    <p className="mt-1 text-sm text-indigo-100/60">
+                      {language === "zh"
+                        ? `显示 ${filteredArchiveRecords.length} / ${records.length} 条私有归档`
+                        : `Showing ${filteredArchiveRecords.length} of ${records.length} private archives`}
+                    </p>
+                  </div>
+                  <button
+                    className="rounded-xl border border-indigo-300/30 px-3 py-2 text-sm text-indigo-50 transition hover:border-indigo-200 hover:bg-indigo-300/10"
+                    onClick={clearArchiveFilters}
+                    type="button"
+                  >
+                    {language === "zh" ? "清除筛选" : "Clear filters"}
+                  </button>
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  <label className="grid gap-2 text-sm text-indigo-100/75 xl:col-span-2">
+                    <span>{language === "zh" ? "搜索归档" : "Search archives"}</span>
+                    <input
+                      className="rounded-xl border border-indigo-300/25 bg-slate-900 px-3 py-2.5 text-slate-50 outline-none transition placeholder:text-indigo-100/35 focus:border-indigo-200"
+                      onChange={(event) => setArchiveSearchQuery(event.target.value)}
+                      placeholder={
+                        language === "zh"
+                          ? "文件名、分类、金额、摘要或 OCR 文字"
+                          : "File name, category, amount, summary, or OCR text"
+                      }
+                      type="search"
+                      value={archiveSearchQuery}
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm text-indigo-100/75">
+                    <span>{language === "zh" ? "状态" : "Status"}</span>
+                    <select
+                      className="rounded-xl border border-indigo-300/25 bg-slate-900 px-3 py-2.5 text-slate-50 outline-none transition focus:border-indigo-200"
+                      onChange={(event) => setArchiveStatusFilter(event.target.value)}
+                      value={archiveStatusFilter}
+                    >
+                      <option value="all">{language === "zh" ? "全部状态" : "All statuses"}</option>
+                      {archiveFilterOptions.statuses.map((status) => <option key={status} value={status}>{status}</option>)}
+                    </select>
+                  </label>
+                  <label className="grid gap-2 text-sm text-indigo-100/75">
+                    <span>{language === "zh" ? "分类" : "Category"}</span>
+                    <select
+                      className="rounded-xl border border-indigo-300/25 bg-slate-900 px-3 py-2.5 text-slate-50 outline-none transition focus:border-indigo-200"
+                      onChange={(event) => setArchiveCategoryFilter(event.target.value)}
+                      value={archiveCategoryFilter}
+                    >
+                      <option value="all">{language === "zh" ? "全部分类" : "All categories"}</option>
+                      {archiveFilterOptions.categories.map((category) => <option key={category} value={category}>{category}</option>)}
+                    </select>
+                  </label>
+                  <label className="grid gap-2 text-sm text-indigo-100/75">
+                    <span>{language === "zh" ? "文档类型" : "Document type"}</span>
+                    <select
+                      className="rounded-xl border border-indigo-300/25 bg-slate-900 px-3 py-2.5 text-slate-50 outline-none transition focus:border-indigo-200"
+                      onChange={(event) => setArchiveDocumentTypeFilter(event.target.value)}
+                      value={archiveDocumentTypeFilter}
+                    >
+                      <option value="all">{language === "zh" ? "全部类型" : "All types"}</option>
+                      {archiveFilterOptions.documentTypes.map((documentType) => <option key={documentType} value={documentType}>{documentType}</option>)}
+                    </select>
+                  </label>
+                </div>
+              </section>
               <div className="mt-6 grid gap-3 md:grid-cols-2">
-                {records.map((record) => (
+                {filteredArchiveRecords.map((record) => (
                   <article
                     className={`rounded-2xl border bg-slate-950/60 p-4 ${
                       editingRecordId === record.id
@@ -1817,6 +1948,13 @@ export default function Home() {
                   </article>
                 ))}
               </div>
+              {filteredArchiveRecords.length === 0 ? (
+                <p className="mt-4 rounded-xl border border-dashed border-indigo-300/25 bg-slate-950/60 px-4 py-5 text-sm leading-6 text-indigo-100/70">
+                  {language === "zh"
+                    ? "没有找到匹配的私有归档。调整关键词或清除筛选不会删除任何记录。"
+                    : "No matching private archives. Adjust the search or clear filters; no records are deleted."}
+                </p>
+              ) : null}
             </section>
 
             <section

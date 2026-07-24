@@ -2,7 +2,7 @@
 
 **ID:** `archive-search-filter`
 **Harness mode:** H2 — Product Feature
-**Status:** ready for execution; no implementation has started.
+**Status:** blocked pending the authenticated-browser evidence required by AC-6; static implementation and hard checks passed.
 
 ## Goal
 

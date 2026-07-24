@@ -14,6 +14,7 @@
 - AI-generated category persistence and archive display, accepted by authenticated browser review on 2026-07-20.
 - Monthly spending dashboard with category allocation, accepted by authenticated browser review on 2026-07-20.
 - OCR → DeepSeek → Supabase archive flow, documented in `docs/acceptance/ocr-deepseek.md`.
+- Real server-side OCR → DeepSeek analysis readiness, accepted on 2026-07-20; the review record is `docs/acceptance/real-api-analysis-readiness-review.json`.
 - Global independent acceptance reviewer with six verdicts.
 - Three-layer control architecture and project-local dependency bootstrap authority, accepted by independent review.
 
@@ -21,13 +22,13 @@
 
 | Feature | Status | Dependency | Next action |
 | --- | --- | --- | --- |
-| Archive search and filtering | ready | three-layer control architecture | Create the next bounded Task Brief after the completed GitHub publication. |
+| Archive search and filtering | blocked | authenticated browser evidence for AC-6 | Implementation, RLS inspection, lint, and build passed; await direct logged-in search, combined-filter, clear, and refresh evidence. |
 
 ## Queued after the active feature passes
 
 | Feature | Status | Dependency | Proposed outcome |
 | --- | --- | --- | --- |
-| Archive search and filtering | pending | three-layer control architecture | Users can locate only their own archives by structured fields. |
+| Public deployment readiness | blocked | Vercel account verification | Resume after Vercel removes the account-verification block; then configure production variables, Supabase Auth redirect URLs, and public smoke tests. |
 | Delete and re-analyze | pending | archive search and filtering | Users can remove or reprocess only their own records. |
 | Email verification and password recovery | pending | auth regression brief | Account lifecycle is reliable without weakening session handling. |
 | Deployment readiness | pending | functional features and release brief | Production configuration and smoke tests are explicit. |
@@ -39,4 +40,4 @@
 
 ## Active Task Brief
 
-No product feature is active. GitHub publication to the configured remote's `main` branch completed on 2026-07-20. The next product feature is **Archive search and filtering**.
+`archive-search-filter` v1 is blocked only on its required authenticated-browser evidence. The independent reviewer result is `docs/acceptance/archive-search-filter-review.json`. Public deployment remains blocked by Vercel account verification and will resume after that external prerequisite is resolved.
